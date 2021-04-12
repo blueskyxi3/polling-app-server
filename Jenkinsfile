@@ -15,6 +15,10 @@ podTemplate(label: label, containers: [
     def myRepo = checkout scm
     def gitCommit = myRepo.GIT_COMMIT
     def gitBranch = myRepo.GIT_BRANCH
+    def imageTag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+    def dockerRegistryUrl = "registry.citictel.com"
+    def imageEndpoint = "demo/polling-app-server"
+    def image = "${dockerRegistryUrl}/${imageEndpoint}"
 
     stage('单元测试') {
       echo "测试阶段"
