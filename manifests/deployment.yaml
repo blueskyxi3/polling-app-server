@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: polling-server
-  namespace: course
+  namespace: demo
   labels:
     app: polling-server
 spec:
@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       imagePullPolicy: IfNotPresent
       containers:
-      - image: registry.qikqiak.com/course/polling-server:<BUILD_TAG>
+      - image: registry.citictel.com/demo/polling-server:<BUILD_TAG>
         name: polling-server
         imagePullSecrets:
         - name: myreg
