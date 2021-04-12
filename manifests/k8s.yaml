@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: polling-server
+  namespace: demo
+  labels:
+    app: polling-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: polling-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: polling-server
+    spec:
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: demo-reg1
+      containers:
+        - image: registry.citictel.com/demo/polling-app-server:557ee5f
+          imagePullPolicy: IfNotPresent
+          name: polling-server
+          ports:
+            - containerPort: 8080
+              name: api
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "64M"
+            limits:
+              cpu: "50m"
+              memory: "128M"
+          livenessProbe:
+            httpGet:
+              path: /api/_status/healthz
+              port: 8080
+            initialDelaySeconds: 90
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/_status/healthz
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+          env:
+            - name: DB_HOST
+              value: localhost
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: polling_app
+            - name: DB_NAME
+              value: root
+            - name: DB_PASSWORD
+              value: root
