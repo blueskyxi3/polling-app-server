@@ -48,8 +48,7 @@ podTemplate(label: label, containers: [
     }
     
     stage('运行 Kubectl') {
-      container('kubectl') {
-        def userInput = input(
+      def userInput = input(
         id: 'userInput',
         message: 'Choose a deploy environment',
         parameters: [
@@ -60,7 +59,8 @@ podTemplate(label: label, containers: [
             ]
          ]
         )
-       echo "This is a deploy step to ${userInput.Env}"    
+      echo "This is a deploy step to ${userInput.Env}" 
+      container('kubectl') {          
        echo "查看 K8S 集群 Pod 列表"
        if (userInput.Env == "Dev") {
        // deploy dev stuff
