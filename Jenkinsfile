@@ -21,7 +21,7 @@ podTemplate(label: label, containers: [
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
     
     stage('版本選擇'){
-      def userInput1 = input id: 'BranchTagId', message: 'please select version to deploy', parameters: [gitParameter(branch: '', branchFilter: '.*', defaultValue: 'origin/master', description: 'select branch or tag to deploy ', listSize: '1', name: 'branchTag', quickFilterEnabled: false, selectedValue: 'TOP', sortMode: 'DESCENDING_SMART', tagFilter: '*', type: 'PT_BRANCH_TAG')]
+      def userInput1 = input id: 'BranchID', message: 'please select version to deploy', parameters: [gitParameter(branch: '', branchFilter: '.*', defaultValue: '', description: '', listSize: '1', name: 'branchTag', quickFilterEnabled: false, selectedValue: 'TOP', sortMode: 'DESCENDING_SMART', tagFilter: '*', type: 'PT_BRANCH_TAG')]
       def version = ${userInput1.branchTag}
       echo "release version is ${version}."
     }
