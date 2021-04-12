@@ -19,12 +19,13 @@ spec:
     metadata:
       labels:
         app: polling-server
+        ref: <CI_ENV>
     spec:
       restartPolicy: Always
       imagePullSecrets:
         - name: demo-reg1
       containers:
-        - image: registry.citictel.com/demo/polling-app-server:557ee5f
+        - image: registry.citictel.com/demo/polling-app-server:<BUILD_TAG>
           imagePullPolicy: IfNotPresent
           name: polling-server
           ports:
@@ -60,3 +61,20 @@ spec:
               value: root
             - name: DB_PASSWORD
               value: root
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: polling-server
+  namespace: demo
+  labels:
+    ref: <CI_ENV>
+spec:
+  selector:
+    app: polling-server
+  type: ClusterIP
+  ports:
+    - name: api-port
+      port: 8080
+      targetPort: api
