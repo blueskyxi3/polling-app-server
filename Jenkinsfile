@@ -46,13 +46,34 @@ podTemplate(label: label, containers: [
         }
       }
     }
+    
     stage('运行 Kubectl') {
       container('kubectl') {
-        echo "查看 K8S 集群 Pod 列表"
-        sh "kubectl get pods"
+        def userInput = input(
+        id: 'userInput',
+        message: 'Choose a deploy environment',
+        parameters: [
+            [
+                $class: 'ChoiceParameterDefinition',
+                choices: "Dev\nQA\nProd",
+                name: 'Env'
+            ]
+         ]
+        )
+       echo "This is a deploy step to ${userInput.Env}"    
+       echo "查看 K8S 集群 Pod 列表"
+       if (userInput.Env == "Dev") {
+       // deploy dev stuff
+        } else if (userInput.Env == "QA"){
+       // deploy qa stuff
+        } else {
+       // deploy prod stuff
+        }
+        sh "kubectl get pods"    
         sh """
           sed -i "s/<IMAGE>/${image}" manifests/k8s.yaml
-          sed -i "s/<IMAGE_TAG>/${imageTag}" manifests/k8s.yaml
+          sed -i "s/<BUILD_TAG>/${imageTag}" manifests/k8s.yaml
+          sed -i "s/<CI_ENV>/${env.BRANCH_NAME}" manifests/k8s.yaml
           kubectl apply -f k8s.yaml
           """
       }
