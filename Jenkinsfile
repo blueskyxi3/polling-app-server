@@ -59,9 +59,7 @@ podTemplate(label: label, containers: [
     stage('运行 Kubectl') {
       def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
       echo "This is a deploy step to ${userInput.Env}" 
-      for(e in env){
-        echo e + " is " + ${e}
-      }
+     
       container('kubectl') {          
        echo "查看 K8S 集群 Pod 列表"
        if (userInput.Env == "Dev") {
