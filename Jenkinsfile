@@ -20,13 +20,15 @@ podTemplate(label: label, containers: [
     def imageEndpoint = "demo/polling-app-server"
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
     
-    stage('版本選擇'){
-      def userInput1 = input id: 'BranchID', message: 'please select version to deploy', parameters: [gitParameter(branch: '', branchFilter: '.*', defaultValue: '', description: '', listSize: '1', name: 'branchTag', quickFilterEnabled: false, selectedValue: 'TOP', sortMode: 'DESCENDING_SMART', tagFilter: '*', type: 'PT_BRANCH_TAG')]
-      def version = ${userInput1.branchTag}
-      echo "release version is ${version}."
-    }
     stage('单元测试') {
       echo "测试阶段"
+      sh """
+         echo "branch_name:${BRANCH_NAME}"
+         echo "BUILD_NUMBER:${BUILD_NUMBER}"
+         echo "BUILD_ID:${BUILD_ID}"
+         echo "JOB_NAME:${JOB_NAME}"
+         echo "BUILD_TAG:${BUILD_TAG}"
+         """
     }
     stage('代码编译打包') {
       try {
@@ -70,8 +72,7 @@ podTemplate(label: label, containers: [
         sh "kubectl get pods"    
         sh """
           sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s.yaml
-          sed -i "s/<CI_ENV>/${version}/" manifests/k8s.yaml
-          sed -i "s/<CI_ENV>/${env.BRANCH_NAME}/" manifests/k8s.yaml
+          sed -i "s/<CI_ENV>/${BRANCH_NAME}/" manifests/k8s.yaml
           kubectl apply -f manifests/k8s.yaml
           """
       }
