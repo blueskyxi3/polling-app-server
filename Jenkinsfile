@@ -19,10 +19,20 @@ podTemplate(label: label, containers: [
     def dockerRegistryUrl = "registry.citictel.com"
     def imageEndpoint = "demo/polling-app-server"
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
+    def branchName = getCurrentBranch()
+     
+
+    def getCurrentBranch () {
+        return sh (
+            script: 'git rev-parse --abbrev-ref HEAD',
+            returnStdout: true
+        ).trim()
+    }
     
     stage('单元测试') {
       echo "测试阶段"
       sh """
+         echo "My branch is${branchName}"
          echo "branch_name:${env.BRANCH_NAME}"
          echo "BUILD_NUMBER:${env.BUILD_NUMBER}"
          echo "BUILD_ID:${env.BUILD_ID}"
