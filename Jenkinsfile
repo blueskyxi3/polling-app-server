@@ -19,16 +19,8 @@ podTemplate(label: label, containers: [
     def dockerRegistryUrl = "registry.citictel.com"
     def imageEndpoint = "demo/polling-app-server"
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
-    def branchName = getCurrentBranch()
+    def branchName = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
      
-
-    def getCurrentBranch () {
-        return sh (
-            script: 'git rev-parse --abbrev-ref HEAD',
-            returnStdout: true
-        ).trim()
-    }
-    
     stage('单元测试') {
       echo "测试阶段"
       sh """
@@ -82,7 +74,7 @@ podTemplate(label: label, containers: [
         sh "kubectl get pods"    
         sh """
           sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s.yaml
-          sed -i "s/<CI_ENV>/${env.BRANCH_NAME}/" manifests/k8s.yaml
+          sed -i "s/<CI_ENV>/${branchName}/" manifests/k8s.yaml
           kubectl apply -f manifests/k8s.yaml
           """
       }
