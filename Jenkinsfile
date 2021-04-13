@@ -23,11 +23,11 @@ podTemplate(label: label, containers: [
     stage('单元测试') {
       echo "测试阶段"
       sh """
-         echo "branch_name:${BRANCH_NAME}"
-         echo "BUILD_NUMBER:${BUILD_NUMBER}"
-         echo "BUILD_ID:${BUILD_ID}"
-         echo "JOB_NAME:${JOB_NAME}"
-         echo "BUILD_TAG:${BUILD_TAG}"
+         echo "branch_name:${env.BRANCH_NAME}"
+         echo "BUILD_NUMBER:${env.BUILD_NUMBER}"
+         echo "BUILD_ID:${env.BUILD_ID}"
+         echo "JOB_NAME:${env.JOB_NAME}"
+         echo "BUILD_TAG:${env.BUILD_TAG}"
          """
     }
     stage('代码编译打包') {
@@ -72,7 +72,7 @@ podTemplate(label: label, containers: [
         sh "kubectl get pods"    
         sh """
           sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s.yaml
-          sed -i "s/<CI_ENV>/${BRANCH_NAME}/" manifests/k8s.yaml
+          sed -i "s/<CI_ENV>/${env.BRANCH_NAME}/" manifests/k8s.yaml
           kubectl apply -f manifests/k8s.yaml
           """
       }
