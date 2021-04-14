@@ -29,7 +29,7 @@ spec:
           image: busybox
           command: ["sh", "-c"]
           args:
-            - echo Prepare to postgresql initialize..;
+            - echo Prepare to mysql initialize..;
               until nc -w 1 -z mysql 3306;
               do echo Waiting for mysql initialization to complete..; sleep 10; done;
               echo Postgresql Initialization successful!;  
@@ -40,13 +40,6 @@ spec:
           ports:
             - containerPort: 8080
               name: api
-          resources:
-            requests:
-              cpu: "25m"
-              memory: "64M"
-            limits:
-              cpu: "50m"
-              memory: "128M"
           livenessProbe:
             httpGet:
               path: /api/_status/healthz
@@ -98,20 +91,18 @@ metadata:
     ref: <CI_ENV>
 spec:    
   ports:
-    - name: dbport
-      protocol: TCP
+    - protocol: TCP
       port: 3306
-      targetPort: 3306
  
  ---
- kind: Endpoints
- apiVersion: v1
- metadata:
-   name: mysql
-   namespace: demo
- subsets:
-   - addresses:
-       - ip: 192.168.101.233
-     ports:
-       - port: 3306
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: demo
+subsets:
+  - addresses:
+      - ip: 192.168.101.233
+    ports:
+      - port: 3306
       
