@@ -23,7 +23,16 @@ spec:
     spec:
       restartPolicy: Always
       imagePullSecrets:
-        - name: demo-reg1
+        - name: demo-reg
+      initContainers:
+        - name: database-init
+          image: busybox
+          command: ["sh", "-c"]
+          args:
+            - echo Prepare to postgresql initialize..;
+              until nc -w 1 -z mysql 3306;
+              do echo Waiting for mysql initialization to complete..; sleep 10; done;
+              echo Postgresql Initialization successful!;  
       containers:
         - image: registry.citictel.com/demo/polling-app-server:<BUILD_TAG>
           imagePullPolicy: IfNotPresent
@@ -78,3 +87,30 @@ spec:
     - name: api-port
       port: 8080
       targetPort: api
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: demo
+  labels:
+    ref: <CI_ENV>
+  ports:
+    - name: dbport
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+ 
+ ---
+ kind: Endpoints
+ apiVersion: v1
+ metadata:
+   name: mysql
+   namespace: demo
+ subsets:
+   - addresses:
+       - ip: 192.168.101.223
+     ports:
+       - port: 3306
+      
