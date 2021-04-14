@@ -2,7 +2,7 @@
 FROM openjdk:8-jdk-alpine
 
 # Add Maintainer Info
-MAINTAINER cnych <icnych@gmail.com>
+MAINTAINER vincentzou <vincentzou@citictel.com>
 
 # 设置locale
 ENV LANG en_US.UTF-8
