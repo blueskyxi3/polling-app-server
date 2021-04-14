@@ -53,8 +53,8 @@ podTemplate(label: label, containers: [
           echo "3. 构建 Docker 镜像阶段"
           sh """
             docker login ${dockerRegistryUrl} -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
-            docker build -t ${image}:${imageTag} .
-            docker push ${image}:${imageTag}
+            docker build -t ${image}:${BranchOrTag} .
+            docker push ${image}:${BranchOrTag}
             """
         }
       }
