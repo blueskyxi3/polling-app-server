@@ -96,6 +96,7 @@ metadata:
   namespace: demo
   labels:
     ref: <CI_ENV>
+spec:    
   ports:
     - name: dbport
       protocol: TCP
