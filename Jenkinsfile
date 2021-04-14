@@ -26,6 +26,15 @@ podTemplate(label: label, containers: [
     }
     stage('单元测试') {
       echo "测试阶段"
+      def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
+      echo "This is a deploy step to ${userInput.Env}" 
+      if (userInput.Env == "Dev") {
+       // deploy dev stuff
+        } else if (userInput.Env == "QA"){
+       // deploy qa stuff
+        } else {
+       // deploy prod stuff
+        }
       sh """
          echo "set BranchOrTag is ${BranchOrTag}"
          echo "My branch is ${branchName}"
@@ -61,18 +70,10 @@ podTemplate(label: label, containers: [
     }
     
     stage('运行 Kubectl') {
-      def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
-      echo "This is a deploy step to ${userInput.Env}" 
-     
+      
       container('kubectl') {          
        echo "查看 K8S 集群 Pod 列表"
-       if (userInput.Env == "Dev") {
-       // deploy dev stuff
-        } else if (userInput.Env == "QA"){
-       // deploy qa stuff
-        } else {
-       // deploy prod stuff
-        }
+       
         sh "kubectl get pods"    
         sh """
           sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s.yaml
