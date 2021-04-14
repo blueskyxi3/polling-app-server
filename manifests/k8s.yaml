@@ -65,11 +65,11 @@ spec:
             - name: DB_PORT
               value: "3306"
             - name: DB_NAME
-              value: polling_app
-            - name: DB_NAME
-              value: root
+              value: polling
+            - name: DB_USER
+              value: pollingapp
             - name: DB_PASSWORD
-              value: root
+              value: Poll2021
 
 ---
 kind: Service
@@ -111,7 +111,7 @@ spec:
    namespace: demo
  subsets:
    - addresses:
-       - ip: 192.168.101.223
+       - ip: 192.168.101.233
      ports:
        - port: 3306
       
