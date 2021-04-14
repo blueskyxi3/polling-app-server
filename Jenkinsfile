@@ -20,11 +20,15 @@ podTemplate(label: label, containers: [
     def imageEndpoint = "demo/polling-app-server"
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
     def branchName = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
-     
+    
+    parameters {
+        gitParameter name: 'BranchOrTag', type: 'PT_BRANCH_TAG', defaultValue: 'master', listSize: '1', sortMode: 'DESCENDING_SMART', description: 'Select branch to build'
+    }
     stage('单元测试') {
       echo "测试阶段"
       sh """
-         echo "My branch is${branchName}"
+         echo "set BranchOrTag is ${BranchOrTag}"
+         echo "My branch is ${branchName}"
          echo "branch_name:${env.BRANCH_NAME}"
          echo "BUILD_NUMBER:${env.BUILD_NUMBER}"
          echo "BUILD_ID:${env.BUILD_ID}"
