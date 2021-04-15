@@ -28,14 +28,9 @@ podTemplate(label: label, containers: [
       echo "测试阶段"
       def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
       echo "This is a deploy step to ${userInput.Env}" 
-      if (userInput.Env == "Dev") {
-       // deploy dev stuff
-        } else if (userInput.Env == "QA"){
-       // deploy qa stuff
-        } else {
-       // deploy prod stuff
-        }
+     
       sh """
+         echo "gitBranch-->${gitBranch}"
          echo "set BranchOrTag is ${BranchOrTag}"
          echo "My branch is ${branchName}"
          echo "branch_name:${env.BRANCH_NAME}"
@@ -44,6 +39,9 @@ podTemplate(label: label, containers: [
          echo "JOB_NAME:${env.JOB_NAME}"
          echo "BUILD_TAG:${env.BUILD_TAG}"
          """
+      
+      def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
+      echo "This is a deploy step to ${userInput.Env}"
     }
     stage('代码编译打包') {
       try {
