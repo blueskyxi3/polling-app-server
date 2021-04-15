@@ -26,9 +26,6 @@ podTemplate(label: label, containers: [
     }
     stage('单元测试') {
       echo "测试阶段"
-      def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
-      echo "This is a deploy step to ${userInput.Env}" 
-     
       sh """
          echo "gitBranch-->${gitBranch}"
          echo "set BranchOrTag is ${BranchOrTag}"
@@ -38,8 +35,7 @@ podTemplate(label: label, containers: [
          echo "BUILD_ID:${env.BUILD_ID}"
          echo "JOB_NAME:${env.JOB_NAME}"
          echo "BUILD_TAG:${env.BUILD_TAG}"
-         """
-      
+         """ 
       def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
       echo "This is a deploy step to ${userInput.Env}"
     }
