@@ -24,8 +24,8 @@ podTemplate(label: label, containers: [
     parameters {
         gitParameter name: 'BranchOrTag', type: 'PT_BRANCH_TAG', defaultValue: 'master', listSize: '1', sortMode: 'DESCENDING_SMART', description: 'Select branch to build'
     }
-    stage('单元测试') {
-      echo "测试阶段"
+    stage('參數檢測') {
+      echo "參數檢測"
       sh """
          echo "gitBranch-->${gitBranch}"
          echo "set BranchOrTag is ${BranchOrTag}"
@@ -40,11 +40,15 @@ podTemplate(label: label, containers: [
       echo "flag--->${flag}"
       def branch = gitBranch.substring(gitBranch.indexOf("/")+1)
       echo "branch--->${branch}"
-      String testString = 'hello brother'
-      assert testString.split() instanceof String[]
-      assert ['hello','brother']==testString.split() //split with no arguments
-      assert['he','','o brother']==testString.split('l')
-
+      echo "imageTag--->${imageTag}"
+      if(${branch} == "master"){
+        imageTag = "xx"
+      }
+      echo "imageTag--->${imageTag}"
+    }
+    stage('单元测试') {
+      echo "测试阶段"
+      echo "imageTag3--->${imageTag}"
       def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
       echo "This is a deploy step to ${userInput.Env}"
     }
