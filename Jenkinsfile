@@ -41,7 +41,7 @@ podTemplate(label: label, containers: [
       def branch = gitBranch.substring(gitBranch.indexOf("/")+1)
       echo "branch--->${branch}"
       echo "imageTag--->${imageTag}"
-      if(${branch} == "master"){
+      if(branch == "master"){
         imageTag = "xx"
       }
       echo "imageTag--->${imageTag}"
