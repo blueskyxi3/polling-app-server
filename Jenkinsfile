@@ -76,7 +76,7 @@ podTemplate(label: label, containers: [
        
         sh "kubectl get pods"    
         sh """
-          sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s.yaml
+          sed -i "s/<BUILD_TAG>/${branchName}/" manifests/k8s.yaml
           sed -i "s/<CI_ENV>/${branchName}/" manifests/k8s.yaml
           kubectl apply -f manifests/k8s.yaml
           """
