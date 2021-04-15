@@ -36,6 +36,15 @@ podTemplate(label: label, containers: [
          echo "JOB_NAME:${env.JOB_NAME}"
          echo "BUILD_TAG:${env.BUILD_TAG}"
          """ 
+      def flag = gitBranch.contains("master")
+      echo "flag--->${flag}"
+      def branch = gitBranch.substring(gitBranch.indexOf("/")+1)
+      echo "branch--->${branch}"
+      String testString = 'hello brother'
+      assert testString.split() instanceof String[]
+      assert ['hello','brother']==testString.split() //split with no arguments
+      assert['he','','o brother']==testString.split('l')
+
       def userInput = input id: 'inputId001', message: ' Ready to go?', parameters: [choice(choices: ['Dev', 'Stg', 'Prd'], description: 'production information', name: 'Env'), booleanParam(defaultValue: true, description: '', name: 'flag')]
       echo "This is a deploy step to ${userInput.Env}"
     }
