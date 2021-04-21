@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: polling-server
+  namespace: demo
+  labels:
+    app: polling-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: polling-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: polling-server
+        ref: <CI_ENV>
+    spec:
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: demo-reg
+      initContainers:
+        - name: database-init
+          image: busybox
+          command: ["sh", "-c"]
+          args:
+            - echo Prepare to mysql initialize..;
+              until nc -w 1 -z mysql 3306;
+              do echo Waiting for mysql initialization to complete..; sleep 10; done;
+              echo Postgresql Initialization successful!;  
+      containers:
+        - image: registry.citictel.com/demo/polling-app-server:<BUILD_TAG>
+          imagePullPolicy: IfNotPresent
+          name: polling-server
+          ports:
+            - containerPort: 8080
+              name: api
+          livenessProbe:
+            httpGet:
+              path: /api/_status/healthz
+              port: 8080
+            initialDelaySeconds: 90
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/_status/healthz
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+          env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: polling
+            - name: DB_USER
+              value: pollingapp
+            - name: DB_PASSWORD
+              value: Poll2021
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: polling-server
+  namespace: demo
+  labels:
+    ref: <CI_ENV>
+spec:
+  selector:
+    app: polling-server
+  type: ClusterIP
+  ports:
+    - name: api-port
+      port: 8080
+      targetPort: api
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: demo
+  labels:
+    ref: <CI_ENV>
+spec:    
+  ports:
+    - protocol: TCP
+      port: 3306
+
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: demo
+subsets:
+  - addresses:
+      - ip: 192.168.101.233
+    ports:
+      - port: 3306
