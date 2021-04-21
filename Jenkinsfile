@@ -47,7 +47,10 @@ podTemplate(label: label, containers: [
       }
       echo "imageTag--->${imageTag}"
     }
-    
+    stage('单元测试') {
+      echo "1.测试阶段"
+      echo "set BranchOrTag is ${BranchOrTag}"  
+    }
     stage('代码编译打包') {
       try {
       container('maven') {
