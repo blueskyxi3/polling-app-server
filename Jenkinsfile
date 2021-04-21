@@ -40,7 +40,7 @@ podTemplate(label: label, containers: [
          echo " ----------------------- "
          """   
       if(gitBranch.indexOf("/")>0){
-        imageTag = branch + imageTag
+        imageTag = branch +"-"+ imageTag
       }else{
         echo "----else---"
         imageTag = BranchOrTag
@@ -76,20 +76,15 @@ podTemplate(label: label, containers: [
       
       container('kubectl') {          
        echo "查看 K8S 集群 Pod 列表"
-        sh "kubectl get pods"   
-        
+        sh "kubectl get pods -n demo"   
         sh """
-          sed -i "s/<BUILD_TAG>/${branch}/" manifests/k8s.yaml
+          sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s.yaml
           sed -i "s/<CI_ENV>/${branch}/" manifests/k8s.yaml
           kubectl apply -f manifests/k8s.yaml
           """
+         sh "kubectl get pods -n demo"   
       }
     }
-    stage('运行 Helm') {
-      container('helm') {
-        echo "查看 Helm Release 列表"
-        sh "helm list"
-      }
-    }
+    
   }
 }
