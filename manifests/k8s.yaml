@@ -32,7 +32,7 @@ spec:
             - echo Prepare to mysql initialize..;
               until nc -w 1 -z mysql 3306;
               do echo Waiting for mysql initialization to complete..; sleep 10; done;
-              echo Postgresql Initialization successful!;  
+              echo mysql Initialization successful!;  
       containers:
         - image: registry.citictel.com/demo/polling-app-server:<BUILD_TAG>
           imagePullPolicy: IfNotPresent
