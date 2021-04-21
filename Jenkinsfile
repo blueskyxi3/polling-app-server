@@ -19,6 +19,7 @@ podTemplate(label: label, containers: [
     def dockerRegistryUrl = "registry.citictel.com"
     def imageEndpoint = "demo/polling-app-server"
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
+    def branch = gitBranch.substring(gitBranch.indexOf("/")+1)
     
     parameters {
         gitParameter name: 'BranchOrTag', type: 'PT_BRANCH_TAG', defaultValue: 'master', listSize: '1', sortMode: 'DESCENDING_SMART', description: 'Select branch to build'
@@ -34,15 +35,14 @@ podTemplate(label: label, containers: [
          echo "BUILD_ID:${env.BUILD_ID}"
          echo "JOB_NAME:${env.JOB_NAME}"
          echo "BUILD_TAG:${env.BUILD_TAG}"
+         echo "branch:${branch}"
+         echo "imageTag--->${imageTag}"
          echo " ----------------------- "
-         """ 
-      def branch = gitBranch.substring(gitBranch.indexOf("/")+1)
-      echo "if branch--->${branch}"
-      echo "imageTag--->${imageTag}"
+         """   
       if(gitBranch.indexOf("/")>0){
-        imageTag = branch +"-"+ imageTag
+        imageTag = branch + imageTag
       }else{
-         echo "----else---"
+        echo "----else---"
         imageTag = BranchOrTag
       }
       echo "imageTag--->${imageTag}"
