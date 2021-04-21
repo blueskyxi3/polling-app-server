@@ -29,7 +29,6 @@ podTemplate(label: label, containers: [
          echo " ----------------------- "
          echo "gitBranch-->${gitBranch}"
          echo "set BranchOrTag is ${BranchOrTag}"
-         echo "My branch is ${branchName}"
          echo "branch_name:${env.BRANCH_NAME}"
          echo "BUILD_NUMBER:${env.BUILD_NUMBER}"
          echo "BUILD_ID:${env.BUILD_ID}"
