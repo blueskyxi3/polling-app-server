@@ -63,6 +63,8 @@ spec:
               value: pollingapp
             - name: DB_PASSWORD
               value: Poll2021
+            - name: APP_VERSION
+              value: <BUILD_TAG>  
 
 ---
 kind: Service

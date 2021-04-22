@@ -9,10 +9,7 @@ import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
 @SpringBootApplication
-@EntityScan(basePackageClasses = {
-		PollsApplication.class,
-		Jsr310JpaConverters.class
-})
+@EntityScan(basePackageClasses = { PollsApplication.class, Jsr310JpaConverters.class })
 public class PollsApplication {
 
 	@PostConstruct
@@ -21,6 +18,8 @@ public class PollsApplication {
 	}
 
 	public static void main(String[] args) {
+		String version = System.getenv("APP_VERSION");
+		System.out.println("version is ---------> " + version);
 		SpringApplication.run(PollsApplication.class, args);
 	}
 }

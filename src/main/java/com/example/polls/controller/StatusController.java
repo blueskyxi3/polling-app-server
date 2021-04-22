@@ -10,7 +10,12 @@ public class StatusController {
 
     @GetMapping
     public String healthCheck() {
-        System.out.Println("version is ---------> 0.0.7!");
+        
+        String java_home = System.getenv("JAVA_HOME");
+        String version = System.getenv("APP_VERSION");
+        System.out.println("version is ---------> "+version);
+        System.out.println("java_home is ---------> "+java_home);
+        
         return "UP";
     }
 

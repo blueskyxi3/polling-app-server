@@ -79,13 +79,24 @@ podTemplate(label: label, containers: [
       
       container('kubectl') {          
        echo "查看 K8S 集群 Pod 列表"
-        sh "kubectl get pods -n demo"   
+        if(gitBranch.indexOf("dev") > 0){
+         sh """
+          kubectl get pods -n dev
+          sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s-dev.yaml
+          sed -i "s/<CI_ENV>/${branch}/" manifests/k8s-dev.yaml
+          kubectl apply -f manifests/k8s-dev.yaml
+          kubectl get pods -n dev
+          """
+        }else{
+        echo "---------tag------------" 
         sh """
+          kubectl get pods -n demo
           sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s.yaml
           sed -i "s/<CI_ENV>/${branch}/" manifests/k8s.yaml
           kubectl apply -f manifests/k8s.yaml
+          kubectl get pods -n demo
           """
-         sh "kubectl get pods -n demo"   
+        }    
       }
     }
     

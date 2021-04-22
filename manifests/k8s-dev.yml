@@ -2,106 +2,114 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: polling-server
-  namespace: demo
+  namespace: dev
   labels:
     app: polling-server
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: polling-server
   strategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
     type: RollingUpdate
+  selector:
+    matchLabels:
+      app: polling-server
   template:
     metadata:
       labels:
         app: polling-server
-        ref: <CI_ENV>
     spec:
       restartPolicy: Always
       imagePullSecrets:
-        - name: demo-reg
-      initContainers:
-        - name: database-init
-          image: busybox
-          command: ["sh", "-c"]
-          args:
-            - echo Prepare to mysql initialize..;
-              until nc -w 1 -z mysql 3306;
-              do echo Waiting for mysql initialization to complete..; sleep 10; done;
-              echo Postgresql Initialization successful!;  
+        - name: myreg
       containers:
-        - image: registry.citictel.com/demo/polling-app-server:<BUILD_TAG>
-          imagePullPolicy: IfNotPresent
-          name: polling-server
-          ports:
-            - containerPort: 8080
-              name: api
-          livenessProbe:
-            httpGet:
-              path: /api/_status/healthz
-              port: 8080
-            initialDelaySeconds: 90
-            timeoutSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /api/_status/healthz
-              port: 8080
-            initialDelaySeconds: 30
-            timeoutSeconds: 10
-          env:
-            - name: DB_HOST
-              value: mysql
-            - name: DB_PORT
-              value: "3306"
-            - name: DB_NAME
-              value: polling
-            - name: DB_USER
-              value: pollingapp
-            - name: DB_PASSWORD
-              value: Poll2021
+      - image: registry.citictel.com/demo2/polling-app-server::<BUILD_TAG>
+        name: polling-server
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: api
+        env:
+        - name: DB_HOST
+          value: mysql
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_NAME
+          value: polling_app
+        - name: DB_USER
+          value: polling
+        - name: DB_PASSWORD
+          value: polling321
+        - name: APP_VERSION
+          value: <BUILD_TAG>    
 
 ---
+
 kind: Service
 apiVersion: v1
 metadata:
   name: polling-server
-  namespace: demo
-  labels:
-    ref: <CI_ENV>
+  namespace: dev
 spec:
   selector:
     app: polling-server
-  type: ClusterIP
+  type:  ClusterIP
   ports:
-    - name: api-port
-      port: 8080
-      targetPort: api
+  - name: api-port
+    port: 8080
+    targetPort:  api
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3306
+          name: dbport
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: rootPassW0rd
+        - name: MYSQL_DATABASE
+          value: polling_app
+        - name: MYSQL_USER
+          value: polling
+        - name: MYSQL_PASSWORD
+          value: polling321
+        volumeMounts:
+        - name: db
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: db
+        hostPath:
+          path: /var/lib/mysql
 
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: mysql
-  namespace: demo
-  labels:
-    ref: <CI_ENV>
-spec:    
+  namespace: dev
+spec:
+  selector:
+    app: mysql
+  type:  ClusterIP
   ports:
-    - protocol: TCP
-      port: 3306
-
----
-kind: Endpoints
-apiVersion: v1
-metadata:
-  name: mysql
-  namespace: demo
-subsets:
-  - addresses:
-      - ip: 192.168.101.233
-    ports:
-      - port: 3306
+  - name: dbport
+    port: 3306
+    targetPort: dbport
